@@ -1,4 +1,3 @@
-# Terraform Block
 terraform {
     required_providers {
         azurerm = {
@@ -15,7 +14,6 @@ terraform {
     }
 }
 
-# Provider Block
 provider "azurerm" {
     features {
         key_vault {
@@ -25,20 +23,17 @@ provider "azurerm" {
     }
 }
 
-# Random String
 resource "random_string" "random_string" {
     length = 10
     special = false
     upper = false
 }
 
-# Azure Resource Group
 resource "azurerm_resource_group" "rg_backend" {
     name     = var.rg_backend_name
     location = var.rg_backend_location
 }
 
-# Azure Storage Account
 resource "azurerm_storage_account" "sa_backend" {
     name                     = "${lower(var.sa_backend_name)}${random_string.random_string.result}"
     resource_group_name      = azurerm_resource_group.rg_backend.name
@@ -47,14 +42,12 @@ resource "azurerm_storage_account" "sa_backend" {
     account_replication_type = "GRS"
 }
 
-# Azure Storage Container
 resource "azurerm_storage_container" "sc_backend" {
     name                  = var.sc_backend_name
     storage_account_name  = azurerm_storage_account.sa_backend.name
     container_access_type = "private"
 }
 
-# Azure Key Vault
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_key_vault" "kv_backend" {
