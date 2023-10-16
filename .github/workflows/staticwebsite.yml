@@ -8,18 +8,6 @@ on:
   push:
     paths:
       - 'staticwebsite/**'
-
-  # Allows you to run this workflow manually from the action tab
-  workflow_dispatch:
-    inputs:
-      action_type:
-        description: 'What action should be performed (apply/destroy)'
-        required: true
-        default: 'apply'
-        type: choice
-        options:
-          - 'apply'
-          - 'destroy'
     
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -50,18 +38,6 @@ jobs:
       - name: 'Terraform plan'
         id: plan
         run: terraform plan
-        working-directory: ${{ env.WORKING_DIR }} 
-
-      - name: 'Terraform apply'
-        if: github.event.inputs.action_type == 'apply'
-        id: apply
-        run: terraform apply -auto-approve
-        working-directory: ${{ env.WORKING_DIR }}
-
-      - name: 'Terraform destroy'
-        if: github.event.inputs.action_type == 'destroy'
-        id: destroy
-        run: terraform destroy -auto-approve
         working-directory: ${{ env.WORKING_DIR }} 
                     
       - name: 'Check last commit message'
