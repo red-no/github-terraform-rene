@@ -35,25 +35,19 @@ jobs:
         run: terraform init -upgrade
         working-directory: ${{ env.WORKING_DIR }}          
 
+      - name: 'Terraform plan'
+        id: plan
+        run: terraform plan
+        working-directory: ${{ env.WORKING_DIR }} 
+                    
       - name: 'Check last commit message'
         id: commit
-        run: |
-          MESSAGE=$(git log --format=%B -n 1)
-          echo "Commit message: $MESSAGE"
-          echo "::set-output name=message::$MESSAGE"
-      
+        run: echo "::set-output name=message::$(git log --format=%B -n 1)"
       - name: 'Conditionally run Terraform action'
         run: |
-          echo "Commit Message: '${{ steps.commit.outputs.message }}'"
-          if echo "${{ steps.commit.outputs.message }}" | grep -iq "destroy"; then
-            echo "Running terraform destroy for all environments"
-            for env in dev stage prod; do
-              echo "Destroying environment: $env"
-              terraform workspace select $env || continue
-              terraform destroy -auto-approve
-            done
+          if [[ "${{ steps.commit.outputs.message }}" == *"destroy"* ]]; then
+            terraform destroy -auto-approve
           else
-            echo "Running terraform apply"
             terraform apply -auto-approve
           fi
         working-directory: ${{ env.WORKING_DIR }}
