@@ -46,7 +46,11 @@ jobs:
       - name: 'Conditionally run Terraform action'
         run: |
           if [[ "${{ steps.commit.outputs.message }}" == *"destroy"* ]]; then
-            terraform destroy -auto-approve
+            for env in dev stage prod
+            do
+              terraform workspace select $env
+              terraform destroy -auto-approve
+            done
           else
             terraform apply -auto-approve
           fi
