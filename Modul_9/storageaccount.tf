@@ -2,6 +2,7 @@ resource "azurerm_storage_account" "sa" {
   name                     = "${var.sa_name}${var.base_sa_name}${random_string.random_string.result}"
   resource_group_name      = azurerm_resource_group.rg-infra.name
   location                 = azurerm_resource_group.rg-infra.location
+  min_tls_version          = "TLS1_2"
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }
