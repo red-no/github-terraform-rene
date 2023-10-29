@@ -7,12 +7,7 @@ resource "azurerm_key_vault" "kv" {
   enabled_for_disk_encryption = true
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   soft_delete_retention_days  = 7
-  purge_protection_enabled    = true
-
-  network_acls {
-    bypass = "AzureServices"
-    default_action = "Deny"
-    }
+  purge_protection_enabled    = false
 
   sku_name = "standard"
 
@@ -38,8 +33,6 @@ resource "azurerm_key_vault_secret" "sa_accesskey" {
   name         = "${var.sa_accesskey_name}${azurerm_storage_account.sa.name}"
   value        = azurerm_storage_account.sa.primary_access_key
   key_vault_id = azurerm_key_vault.kv.id
-  content_type = "password"
-  expiration_date = "2024-12-31T00:00:00Z"
   depends_on = [
     azurerm_storage_account.sa
   ]
@@ -49,8 +42,6 @@ resource "azurerm_key_vault_secret" "vm_password" {
   name         = "${var.vm_name}${random_string.random_string.result}"
   value        = random_password.password.result
   key_vault_id = azurerm_key_vault.kv.id
-  content_type = "password"
-  expiration_date = "2024-12-31T00:00:00Z"
   depends_on = [
     random_password.password
   ]
